@@ -14,7 +14,7 @@ app.get('/', function (req, res) {
     transporter.sendMail({
         from: 'juan.reyes@sngular.com',
         to: 'rated.mvp1@gmail.com',
-        subject: 'New contact form message',
+        subject: 'New contact form message', 
         text: 'blablabla'
     });
 
