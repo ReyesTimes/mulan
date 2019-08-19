@@ -11,10 +11,15 @@ app.get('/', function (req, res) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
+            type: 'OAuth2',
             user: process.env.EMAIL,
-            pass: process.env.PASSWORD,
+            clientId: process.env.CLIENTID,
+            clientSecret: process.env.CLIENTSECRET,
+            refreshToken: process.env.REFRESHTOKEN,
+            accessToken: process.env.ACCESSTOKEN,
         }
     });
+    //1/tENQHJvujRHTNo8r5pwHyJl7aQEJ1GoQzNvp-mse8O8
 
     transporter.sendMail({
         from: 'rated.mvp1@gmail.com',
