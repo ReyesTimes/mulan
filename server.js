@@ -36,8 +36,7 @@ app.post('/', function (req, res) {
 
     // True if some of the attributes new values are false -> validation failed
     const someInvalid = sanitizedAttributes.some(r => !r)
-
-    console.log(someInvalid, ':D');*/
+    */
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -52,11 +51,11 @@ app.post('/', function (req, res) {
 
     transporter.sendMail({
         from: req.body['email'],
-        to: 'contacto@ssrefiscales.com.mx',
-        subject: 'Nuevo mensaje de contacto ' + req.body['name'],
+        to: 'juan.reyes@sngular.com',
+        subject: 'Nuevo mensaje de contacto - ' + req.body['name'],
         text: req.body['description']
     }, function (err, data) {
-        if (err) {
+        if (!err) {
             res.status(200).send({ 'message': 'OH YEAH GET' })
         } else {
             res.status(500).send({ 'message': 'BAD' })
