@@ -1,42 +1,30 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const validator = require('validator');
-const xssFilters = require('xss-filters');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { check, validationResult } = require('express-validator');
+
 const app = express();
+
+const renderMessage = require('./mail/renderMessage.js');
 
 require('dotenv').config();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
-const rejectFunctions = new Map([
-    [ 'name', v => v.length < 5 ],
-    [ 'email', v => !validator.isEmail(v) ],
-    [ 'telephone', v => v.length < 5 ],
-    [ 'description', v => v.length < 5 ]
-])
-
-const validateAndSanitize = (key, value) => {
-    // If map has key and function returns false, return sanitized input. Else, return false
-    return rejectFunctions.has(key) && !rejectFunctions.get(key)(value) && xssFilters.inHTMLData(value)
-}
-
-/*app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});*/
-
-app.post('/', function (req, res) {
-   /*const attributes = ['name', 'email', 'description', 'telephone'];
-
-    // Map each attribute name to the validated and sanitized equivalent (false if validation failed)
-    const sanitizedAttributes = attributes.map(n => validateAndSanitize(n, req.body[n]))
-
-    // True if some of the attributes new values are false -> validation failed
-    const someInvalid = sanitizedAttributes.some(r => !r)
-    */
+app.post('/', [
+    check('email').isEmail(),
+    check('description').isLength({ min: 10 }),
+    check('name').isLength({ min: 3 }),
+],function (req, res) {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -52,16 +40,15 @@ app.post('/', function (req, res) {
     transporter.sendMail({
         from: req.body['email'],
         to: 'juan.reyes@sngular.com',
-        subject: 'Nuevo mensaje de contacto - ' + req.body['name'],
-        text: req.body['description']
+        subject: `Nuevo mensaje de ${req.body['name']} por medio del sitio Web.`,
+        text: renderMessage(req.body)
     }, function (err, data) {
         if (!err) {
-            res.status(200).send({ 'message': 'OH YEAH GET' })
+            res.status(200).send({ 'message': 'Email sending' })
         } else {
-            res.status(500).send({ 'message': 'BAD' })
+            res.status(500).send({ 'message': 'Error send email' })
         }
     });
-
 });
 
 app.listen(process.env.PORT || 8081);
