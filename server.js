@@ -29,7 +29,7 @@ const validateAndSanitize = (key, value) => {
 });*/
 
 app.post('/', function (req, res) {
-    const attributes = ['name', 'email', 'description', 'telephone'];
+   /*const attributes = ['name', 'email', 'description', 'telephone'];
 
     // Map each attribute name to the validated and sanitized equivalent (false if validation failed)
     const sanitizedAttributes = attributes.map(n => validateAndSanitize(n, req.body[n]))
@@ -37,8 +37,8 @@ app.post('/', function (req, res) {
     // True if some of the attributes new values are false -> validation failed
     const someInvalid = sanitizedAttributes.some(r => !r)
 
-    console.log(someInvalid, ':D');
-    /*const transporter = nodemailer.createTransport({
+    console.log(someInvalid, ':D');*/
+    const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             type: 'OAuth2',
@@ -51,19 +51,18 @@ app.post('/', function (req, res) {
     });
 
     transporter.sendMail({
-        from: 'rated.mvp1@gmail.com',
+        from: req.body['email'],
         to: 'contacto@ssrefiscales.com.mx',
-        subject: 'Nuevo mensaje de contacto', 
-        text: 'blablabla'
+        subject: 'Nuevo mensaje de contacto ' + req.body['name'],
+        text: req.body['description']
     }, function (err, data) {
         if (err) {
-            console.log(err);
+            res.status(200).send({ 'message': 'OH YEAH GET' })
         } else {
-            console.log('Email send', data);
+            res.status(500).send({ 'message': 'BAD' })
         }
-    });*/
+    });
 
-    res.status(200).send({ 'message': 'OH YEAH GET' })
 });
 
 app.listen(process.env.PORT || 8081);
