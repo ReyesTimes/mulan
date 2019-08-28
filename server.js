@@ -39,7 +39,7 @@ app.post('/', [
 
     transporter.sendMail({
         from: req.body['email'],
-        to: 'juan.reyes@sngular.com',
+        to: 'contacto@ssrefiscales.com.mx',
         subject: `Nuevo mensaje de ${req.body['name']} por medio del sitio Web.`,
         text: renderMessage(req.body)
     }, function (err, data) {
